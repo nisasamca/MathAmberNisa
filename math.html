@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peminjaman dan Penyimpanan Uang</title>
+
+</head>
+<style>
+    body{
+       background-color: rgb(202, 202, 175);
+    }
+    .container{
+        display: flex;
+       margin: 50px auto;
+       flex-direction: column;
+       align-items: center;
+       background-color: rgb(174, 161, 142);
+       height: 100%;
+       width: 500px;
+       border-radius: 30px;
+       border: solid black;
+       box-shadow: 0 0 10px rgb(54, 32, 14);
+      
+    }
+    h1{
+        text-align: center;
+    }
+</style>
+<body>
+    <h1>Peminjaman dan Penyimpanan Uang</h1>
+    
+    <div class="container">
+        <h2>Perhitungan Bunga</h2>
+        <form id="interestForm">
+            <label for="principal">Jumlah Uang (Rp):</label>
+            <input type="number" id="principal" required><br><br>
+            
+            <label for="rate">Bunga :</label>
+            <input type="number" id="rate" required><br><br>
+            
+            <label for="time">Waktu :</label>
+            <input type="number" id="time" required><br><br>
+            
+            <label for="timeType">Tipe Waktu:</label>
+            <select id="timeType">
+                <option value="years">Tahun</option>
+                <option value="months">Bulan</option>
+            </select><br><br>
+            
+            <label for="interestType">Tipe Bunga:</label>
+            <select id="interestType">
+                <option value="simple">Bunga Tunggal</option>
+                <option value="compound">Bunga Majemuk</option>
+            </select><br><br>
+            
+            <button type="button" onclick="calculateInterest()">Hitung</button>
+        </form>
+
+        <h3>Hasil:</h3>
+        <p id="result">Masukkan detail di atas dan klik hitung.</p>
+    </div>
+
+    <script>
+        function formatRupiah(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for(var i = 0; i < angkarev.length; i++) {
+                if(i % 3 === 0) rupiah += angkarev.substr(i, 3) + '.';
+            }
+            return 'Rp ' + rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function calculateInterest() {
+            const principal = parseFloat(document.getElementById("principal").value);
+            const rate = parseFloat(document.getElementById("rate").value);
+            const time = parseFloat(document.getElementById("time").value);
+            const timeType = document.getElementById("timeType").value;
+            const interestType = document.getElementById("interestType").value;
+
+            let timeInYears = time;
+            if (timeType === "months") {
+                timeInYears = time / 12;
+            }
+
+            let result;
+
+            if (interestType === "simple") {
+                result = principal + (principal * rate * timeInYears) / 100;
+            } else if (interestType === "compound") {
+                result = principal * Math.pow((1 + rate / 100), timeInYears);
+            }
+
+            document.getElementById("result").innerText = `Jumlah Total: ${formatRupiah(result.toFixed(0))}`;
+        }
+    </script>
+</body>
+</html>
+

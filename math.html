@@ -4,49 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peminjaman dan Penyimpanan Uang</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-image: url(Coolbg.jpg);
+            font-family: cursive;
+            margin: 0;
+            padding: 0;
+        }
 
+        .container {
+            display: flex;
+            margin: 50px auto;
+            flex-direction: column;
+            align-items: center;
+            background-color: #d2cac4;
+            height: auto;
+            width: 700px;
+            border-radius: 30px;
+            border: solid rgb(134, 121, 110);
+            box-shadow: 0 0 10px rgb(54, 32, 14);
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        button {
+            text-align: center;
+            background-color: #58463b;
+            border-radius: 10px;
+            transition: transform 0.10s ease;
+            padding: 10px;
+            margin-left: 0;
+            display: block;
+            font-family: cursive;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            color: rgb(0, 0, 0);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            button {
+                font-size: 16px;
+                padding: 10px;
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                margin: 15px auto;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            input, select {
+                width: 100%;
+                font-size: 14px;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            form {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
-<style>
-    body{
-       background-color: rgb(202, 202, 175);
-    }
-    .container{
-        display: flex;
-       margin: 50px auto;
-       flex-direction: column;
-       align-items: center;
-       background-color: rgb(174, 161, 142);
-       height: 100%;
-       width: 500px;
-       border-radius: 30px;
-       border: solid black;
-       box-shadow: 0 0 10px rgb(54, 32, 14);
-      
-    }
-    h1{
-        text-align: center;
-    }
-    
-    button {
-        text-align: center;
-    background-color:#603F26;
-    transition: transform 0.10s ease;
-    padding: 10px;
-    margin-left: 115px;
-    display: flex;
-    }
-
-    button:hover {
-        transform: translateY(-5px);
-        color: black;
-    }
-</style>
 <body>
-    <h1>Peminjaman dan Penyimpanan Uang</h1>
+    <h1>Peminjaman dan <br> Penyimpanan Uang</h1>
     
     <div class="container">
         <h2>Perhitungan Bunga</h2>
-        <form id="interestForm">
+        <form id="interestForm" onsubmit="calculateInterest(event)">
             <label for="principal">Jumlah Uang (Rp):</label>
             <input type="number" id="principal" required><br><br>
             
@@ -60,6 +115,9 @@
             <select id="timeType">
                 <option value="years">Tahun</option>
                 <option value="months">Bulan</option>
+                <option value="triwulan">Triwulan</option>
+                <option value="caturwulan">Caturwulan</option>
+                <option value="semester">Semester</option>
             </select><br><br>
             
             <label for="interestType">Tipe Bunga:</label>
@@ -68,24 +126,27 @@
                 <option value="compound">Bunga Majemuk</option>
             </select><br><br>
             
-            <button type="button" onclick="calculateInterest()">Hitung</button>
+            <button type="submit">Hitung</button>
         </form>
 
         <h3>Hasil:</h3>
         <p id="result">Masukkan detail di atas dan klik hitung.</p>
+        <p id="totalInterest"></p>
     </div>
 
     <script>
         function formatRupiah(angka) {
             var rupiah = '';
             var angkarev = angka.toString().split('').reverse().join('');
-            for(var i = 0; i < angkarev.length; i++) {
-                if(i % 3 === 0) rupiah += angkarev.substr(i, 3) + '.';
+            for (var i = 0; i < angkarev.length; i++) {
+                if (i % 3 === 0) rupiah += angkarev.substr(i, 3) + '.';
             }
             return 'Rp ' + rupiah.split('', rupiah.length - 1).reverse().join('');
         }
 
-        function calculateInterest() {
+        function calculateInterest(event) {
+            event.preventDefault();  // Mencegah form dari refresh halaman
+
             const principal = parseFloat(document.getElementById("principal").value);
             const rate = parseFloat(document.getElementById("rate").value);
             const time = parseFloat(document.getElementById("time").value);
@@ -95,19 +156,27 @@
             let timeInYears = time;
             if (timeType === "months") {
                 timeInYears = time / 12;
+            } else if (timeType === "triwulan") {
+                timeInYears = time / 3;
+            } else if (timeType === "semester") {
+                timeInYears = time / 6;
+            } else if (timeType === "caturwulan") {
+                timeInYears = time / 4;
             }
 
-            let result;
+            let totalAmount, totalInterest;
 
             if (interestType === "simple") {
-                result = principal + (principal * rate * timeInYears) / 100;
+                totalInterest = (principal * rate * timeInYears) / 100;
+                totalAmount = principal + totalInterest;
             } else if (interestType === "compound") {
-                result = principal * Math.pow((1 + rate / 100), timeInYears);
+                totalAmount = principal * Math.pow((1 + rate / 100), timeInYears);
+                totalInterest = totalAmount - principal;
             }
 
-            document.getElementById("result").innerText = `Jumlah Total: ${formatRupiah(result.toFixed(0))}`;
+            document.getElementById("result").innerText = `Jumlah Total: ${formatRupiah(totalAmount.toFixed(0))}`;
+            document.getElementById("totalInterest").innerText = `Total Bunga: ${formatRupiah(totalInterest.toFixed(0))}`;
         }
     </script>
 </body>
 </html>
-
